@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import 'login_or_register.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,9 +13,7 @@ class HomeScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home"),
-      ),
+      appBar: AppBar(title: const Text("Home")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -32,14 +31,25 @@ class HomeScreen extends StatelessWidget {
               },
               child: const Text("Edit Profile"),
             ),
-            IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              // Go back to sign-in screen
-              Navigator.pop(context);
-            },
-          )
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  // Navigate to login screen and clear the stack
+                  if (context.mounted) {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LoginOrRegister(),
+                      ),
+                      (route) => false, // This removes all previous routes
+                    );
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),
