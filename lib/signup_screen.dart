@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'widgets/custom_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   final VoidCallback? onTap;
@@ -43,8 +44,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message ?? e.code)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? e.code)));
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -60,6 +62,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Enter password';
     if (value.length < 6) return 'Password must be at least 6 characters';
+    if (!value.contains(RegExp(r'[A-Z]')))
+      return 'Password must contain at least one uppercase letter';
+    if (!value.contains(RegExp(r'[a-z]')))
+      return 'Password must contain at least one lowercase letter';
+    if (!value.contains(RegExp(r'[0-9]')))
+      return 'Password must contain at least one number';
+    if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
+      return 'Password must contain at least one special character';
+    }
     return null;
   }
 
@@ -79,13 +90,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Sign Up", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                const Text(
+                  "Sign Up",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 30),
                 TextFormField(
                   controller: emailController,
                   decoration: InputDecoration(
                     hintText: "Email",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   validator: validateEmail,
                 ),
@@ -95,7 +111,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: "Password",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   validator: validatePassword,
                 ),
@@ -105,20 +123,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: "Confirm Password",
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   validator: validateConfirm,
                 ),
                 const SizedBox(height: 20),
-                loading
-                    ? const CircularProgressIndicator()
-                    : SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: signUp,
-                          child: const Text("Register"),
-                        ),
-                      ),
+                CustomButton(
+                  text: "Register",
+                  onPressed: signUp,
+                  isLoading: loading,
+                ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
